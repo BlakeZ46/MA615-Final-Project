@@ -1,0 +1,31 @@
+library(shinny)
+library(leaflet)
+
+ui <- shinyUI(fluidPage(
+  
+  ## the area for title
+  headerPanel(title = 'map'),   
+  
+  ## plot the leaflet in the whole page
+  leafletOutput(outputId = 'map',width = '1920px',height = '1080px'),
+  
+  ## control inputs panel and button
+  absolutePanel(width = 500,top=200,left = 'auto',
+                textInput(inputId = 'Start',label = 'FROM',width = "50%"),
+                textInput(inputId = 'Destination',label = 'TO',width = "50%"),
+                textOutput(outputId = 'Request'),
+                submitButton(text = "Submit")
+  )
+))
+
+
+
+server <- function(input, output){
+  output$map <- renderLeaflet({
+    routes <- route(input$Start,input$Destination,structure = "route", output = "simple")
+    m <- leaflet()
+    m <- m%>%addTiles()
+    m %>% addPolylines(routes$lon,routes$lat)
+    
+    
+  })
